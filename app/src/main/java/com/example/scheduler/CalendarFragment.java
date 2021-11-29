@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -39,6 +40,7 @@ public class CalendarFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Context mainContext;
 
     private String tableName = "";
     private EntityList list = new EntityList(EntityList.SCHEDULE_ENTITY);
@@ -81,7 +83,7 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentCalendarBinding.inflate(inflater, container, false);
-
+        mainContext = container.getContext();
         makeUI();
         return binding.getRoot();
     }
@@ -120,13 +122,13 @@ public class CalendarFragment extends Fragment {
         addBtn.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
-                makeDialogue();
+                makeDialogue(null);
             }
         });
         binding.calendarListLayout.addView(addBtn);
     }
 
-    private void makeDialogue(){
+    private void makeDialogue(Entity target){
         int height = 150;
         int width = 100;
         int INF = 9999;
@@ -134,7 +136,11 @@ public class CalendarFragment extends Fragment {
         Context ctx = this.getContext();
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
-        ad.setTitle("추가하기");
+        if(target == null){
+            ad.setTitle("추가하기");
+        }else{
+            ad.setTitle("수정하기");
+        }
         LinearLayout ll = new LinearLayout(this.getContext());
         ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -156,12 +162,20 @@ public class CalendarFragment extends Fragment {
         nameInput.setWidth(INF);
         nameInput.setHint("스케줄을 입력하세요");
         nameLayout.addView(nameInput);
+        if(target != null){
+            nameInput.setText(target.getName());
+        }
         ll.addView(nameLayout);
 
         //
         // Date Picker
         //
-        Calendar dateValue = Entity.getToday();
+        Calendar dateValue;
+        if(target == null) {
+            dateValue = Entity.getToday();
+        }else{
+            dateValue = target.getDate();
+        }
         Log.i("test", new SimpleDateFormat("yyyy-MM-dd").format(dateValue.getTime()));
 
         LinearLayout dateLayout = new LinearLayout(this.getContext());
@@ -230,9 +244,18 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int i){
                 if(nameInput.getText().toString().equals("")){
-                    list.add(new Entity("새로운 스케줄", dateValue));
+                    if(target == null) {
+                        list.add(new Entity("새로운 스케줄", dateValue));
+                    }else{
+                        Toast.makeText(mainContext, "이름을 입력하세요.", Toast.LENGTH_SHORT);
+                    }
                 }else{
-                    list.add(new Entity(nameInput.getText().toString(), dateValue));
+                    if(target == null) {
+                        list.add(new Entity(nameInput.getText().toString(), dateValue));
+                    }else{
+                        target.setName(nameInput.getText().toString());
+                        target.setDate(dateValue);
+                    }
                 }
                 makeUI();
             }

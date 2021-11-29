@@ -88,6 +88,14 @@ public class Entity {
         }
     }
 
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public void setDate(Calendar date){
+        this.date = date;
+    }
+
     public int getGoal() {
         return goal;
     }

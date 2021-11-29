@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         data.add(new EntityList(EntityList.CHECK_ENTITY));
 
         List<String> strList = new ArrayList<String>();
-        strList.add("국어국어국어국어");
-        strList.add("영어영어영어영어");
+        strList.add("국어");
+        strList.add("영어");
         strList.add("수학");
         strList.add("사회");
         strList.add("과학");
