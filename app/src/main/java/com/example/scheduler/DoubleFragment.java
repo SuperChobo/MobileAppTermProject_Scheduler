@@ -132,12 +132,14 @@ public class DoubleFragment extends Fragment {
             nameText.setGravity(Gravity.CENTER_HORIZONTAL);
             nameText.setEllipsize(TextUtils.TruncateAt.END);
             int i = index;
-            nameText.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
+
+            nameText.setOnLongClickListener(new View.OnLongClickListener(){
+                public boolean onLongClick(View view) {
                     makeColumnDialog(i);
+                    return true;
                 }
             });
+
             if(index % 2 == 1){
                 column1Layout.addView(nameText);
             }else{
@@ -147,14 +149,12 @@ public class DoubleFragment extends Fragment {
             index++;
         }
         {
-            TextView nameText = new TextView(this.getContext());
-            nameText.setText("+");
-            nameText.setWidth(width);
-            nameText.setMaxWidth(width);
-            nameText.setSingleLine(true);
-            nameText.setGravity(Gravity.CENTER_HORIZONTAL);
-            nameText.setEllipsize(TextUtils.TruncateAt.END);
-            nameText.setOnClickListener(new View.OnClickListener(){
+            Button addButton = new Button(this.getContext());
+            addButton.setText("+");
+            addButton.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+            addButton.setTextSize(10);
+            addButton.setGravity(Gravity.CENTER_HORIZONTAL);
+            addButton.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
                     makeColumnDialog(-1);
@@ -162,9 +162,9 @@ public class DoubleFragment extends Fragment {
             });
 
             if(index % 2 == 1){
-                column1Layout.addView(nameText);
+                column1Layout.addView(addButton);
             }else{
-                column2Layout.addView(nameText);
+                column2Layout.addView(addButton);
             }
 
         }
@@ -179,10 +179,10 @@ public class DoubleFragment extends Fragment {
             TextView nameText = new TextView(this.getContext());
             nameText.setText(item.getName());
             nameText.setWidth(nameWidth);
-            nameText.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
+            nameText.setOnLongClickListener(new View.OnLongClickListener(){
+                public boolean onLongClick(View view) {
                     makeDialogue(item);
+                    return true;
                 }
             });
 
@@ -208,7 +208,6 @@ public class DoubleFragment extends Fragment {
                         }else{
                             item.setValueOfList('X', ii);
                         }
-                        Log.i("test", item.getValueList());
                     }
                 });
                 ll.addView(cb);

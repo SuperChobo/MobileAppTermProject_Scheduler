@@ -112,10 +112,10 @@ public class NormalChecklist extends Fragment {
             TextView text = new TextView(this.getContext());
             text.setText(name);
             text.setWidth(300);
-            text.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
+            text.setOnLongClickListener(new View.OnLongClickListener(){
+                public boolean onLongClick(View view) {
                     makeDialogue(item);
+                    return true;
                 }
             });
 

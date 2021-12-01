@@ -105,10 +105,10 @@ public class CalendarFragment extends Fragment {
             TextView dateText = new TextView(this.getContext());
             dateText.setText(item.getDateString());
             dateText.setWidth(500);
-            dateText.setOnClickListener(new View.OnClickListener(){
-               @Override
-               public void onClick(View view) {
+            dateText.setOnLongClickListener(new View.OnLongClickListener(){
+               public boolean onLongClick(View view) {
                    makeDialogue(item);
+                   return true;
                }
             });
 

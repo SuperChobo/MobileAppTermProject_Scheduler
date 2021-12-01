@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EntityList {
-    public static int CHECK_ENTITY = 1;
-    public static int SCHEDULE_ENTITY = 2;
-    public static int DOUBLE_ENTITY = 3;
+    public static final int NORMAL_ENTITY = 1;
+    public static final int SCHEDULE_ENTITY = 2;
+    public static final int DOUBLE_ENTITY = 3;
 
     private String name;
     private int type;
@@ -40,6 +40,9 @@ public class EntityList {
         return name;
     }
 
+    public void setName(String name){
+        this.name = name;
+    }
 
     public int getType() {
         return type;

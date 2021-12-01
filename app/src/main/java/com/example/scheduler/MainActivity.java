@@ -1,8 +1,14 @@
 package com.example.scheduler;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -28,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+
+
         setContentView(view);
         setTitle("Advanced Scheduler");
 
@@ -38,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
         binding.menuTab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int position = tab.getPosition();
-                setFragment(position);
+                setFragment(tab.getPosition());
             }
 
             @Override
@@ -49,10 +56,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
+                int position = tab.getPosition();
+                if(position >= list.size()){
+                    position = -1;
+                }
+                makeDialog(position);
             }
         });
-
     }
 
     private void DBInit(){
@@ -64,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         doubleFragment = new DoubleFragment();
 
         list.add(new EntityList("스케줄", EntityList.SCHEDULE_ENTITY));
-        list.add(new EntityList("체크", EntityList.CHECK_ENTITY));
+        list.add(new EntityList("체크", EntityList.NORMAL_ENTITY));
 
         List<String> strList = new ArrayList<String>();
         strList.add("국어");
@@ -108,33 +118,171 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTabView(){
         TabLayout tabLayout = binding.menuTab;
+
         for(EntityList item : list){
             TabLayout.Tab tab = tabLayout.newTab();
             tab.setText(item.getName());
             tabLayout.addTab(tab);
         }
+
+        TabLayout.Tab tab = tabLayout.newTab();
+        tab.setText("+");
+        tabLayout.addTab(tab);
     }
 
-    private void setFragment(int position){
+    private void setFragment(int position) {
         Fragment selected = null;
-        switch(position){
-            case 0:
-                selected = calendarFragment;
-                calendarFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
-                calendarFragment.setData(list.get(position));
-                break;
-            case 1:
-                selected = normalChecklist;
-                normalChecklist.setTableName(binding.menuTab.getTabAt(position).getText().toString());
-                normalChecklist.setData(list.get(position));
-                break;
-            case 2:
-                selected = doubleFragment;
-                doubleFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
-                doubleFragment.setData(list.get(position));
-                break;
 
+        if (position < list.size()) {
+            switch (list.get(position).getType()) {
+                case EntityList.SCHEDULE_ENTITY:
+                    selected = calendarFragment;
+                    calendarFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
+                    calendarFragment.setData(list.get(position));
+                    break;
+                case EntityList.NORMAL_ENTITY:
+                    selected = normalChecklist;
+                    normalChecklist.setTableName(binding.menuTab.getTabAt(position).getText().toString());
+                    normalChecklist.setData(list.get(position));
+                    break;
+                case EntityList.DOUBLE_ENTITY:
+                    selected = doubleFragment;
+                    doubleFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
+                    doubleFragment.setData(list.get(position));
+                    break;
+            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
+        } else {
+            makeDialog(-1);
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
+
+    }
+
+    private void makeDialog(int target){
+        final String scheduleStr = "스케줄";
+        final String normalStr = "일반";
+        final String doubleStr = "2차원";
+
+        int height = 150;
+        int width = 100;
+        int INF = 9999;
+
+        AlertDialog.Builder ad = new AlertDialog.Builder(binding.getRoot().getContext());
+        if(target != -1) {
+            ad.setTitle("테이블 수정");
+        } else {
+            ad.setTitle("테이블 추가");
+        }
+
+        LinearLayout ll = new LinearLayout(binding.getRoot().getContext());
+        ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setPadding(100, 20, 100, 100);
+
+        LinearLayout nameLayout = new LinearLayout(binding.getRoot().getContext());
+        nameLayout.setOrientation(LinearLayout.HORIZONTAL);
+        nameLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
+
+        TextView nameText = new TextView(binding.getRoot().getContext());
+        nameText.setWidth(width);
+        nameText.setText("이름 : ");
+        nameLayout.addView(nameText);
+
+        EditText nameInput = new EditText(binding.getRoot().getContext());
+        nameInput.setWidth(INF);
+        nameInput.setHint("테이블 이름을 입력하시오.");
+
+
+        if(target != -1){
+            nameInput.setText(list.get(target).getName());
+        }
+        nameLayout.addView(nameInput);
+        ll.addView(nameLayout);
+
+
+        LinearLayout typeLayout = new LinearLayout(binding.getRoot().getContext());
+        typeLayout.setOrientation(LinearLayout.HORIZONTAL);
+        typeLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
+
+        TextView typeText = new TextView(binding.getRoot().getContext());
+        typeText.setWidth(width);
+        typeText.setText("타입 : ");
+        typeLayout.addView(typeText);
+
+        Spinner typeSpinner = new Spinner(binding.getRoot().getContext());
+        List<String> typeList = new ArrayList<String>();
+        typeList.add(normalStr);
+        typeList.add(scheduleStr);
+        typeList.add(doubleStr);
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(binding.getRoot().getContext(), android.R.layout.simple_spinner_dropdown_item, typeList);
+        typeSpinner.setAdapter(typeAdapter);
+
+        if(target == -1) {
+            typeLayout.addView(typeSpinner);
+            ll.addView(typeLayout);
+        }
+
+        ad.setPositiveButton("설정", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int index){
+                final String name;
+                int type = 0;
+
+                if(nameInput.getText().toString().equals("")){
+                    name = "새로운 테이블";
+                }else{
+                    name = nameInput.getText().toString();
+                }
+
+                if(target == -1) {
+                    String typeStr = typeSpinner.getSelectedItem().toString();
+                    switch (typeStr) {
+                        case normalStr:
+                            type = EntityList.NORMAL_ENTITY;
+                            break;
+                        case scheduleStr:
+                            type = EntityList.SCHEDULE_ENTITY;
+                            break;
+                        case doubleStr:
+                            type = EntityList.DOUBLE_ENTITY;
+                            break;
+                    }
+                }
+
+                if(target != -1){
+                    list.get(target).setName(name);
+                    binding.menuTab.getTabAt(target).setText(name);
+
+                } else {
+                    list.add(new EntityList(name, type));
+                    TabLayout tabLayout = binding.menuTab;
+                    TabLayout.Tab tab = tabLayout.newTab();
+                    tab.setText(name);
+                    tabLayout.addTab(tab, list.size() - 1);
+                    tabLayout.selectTab(tab);
+                    setFragment(list.size() - 1);
+                }
+            }
+        });
+
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        if(target != -1) {
+            ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int index) {
+                    list.remove(target);
+                    binding.menuTab.removeTabAt(target);
+                }
+            });
+        }
+
+        ad.setView(ll);
+        ad.show();
     }
 }
