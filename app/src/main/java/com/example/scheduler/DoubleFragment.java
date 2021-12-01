@@ -131,7 +131,13 @@ public class DoubleFragment extends Fragment {
             nameText.setSingleLine(true);
             nameText.setGravity(Gravity.CENTER_HORIZONTAL);
             nameText.setEllipsize(TextUtils.TruncateAt.END);
-
+            int i = index;
+            nameText.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    makeColumnDialog(i);
+                }
+            });
             if(index % 2 == 1){
                 column1Layout.addView(nameText);
             }else{
@@ -139,6 +145,28 @@ public class DoubleFragment extends Fragment {
             }
 
             index++;
+        }
+        {
+            TextView nameText = new TextView(this.getContext());
+            nameText.setText("+");
+            nameText.setWidth(width);
+            nameText.setMaxWidth(width);
+            nameText.setSingleLine(true);
+            nameText.setGravity(Gravity.CENTER_HORIZONTAL);
+            nameText.setEllipsize(TextUtils.TruncateAt.END);
+            nameText.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    makeColumnDialog(-1);
+                }
+            });
+
+            if(index % 2 == 1){
+                column1Layout.addView(nameText);
+            }else{
+                column2Layout.addView(nameText);
+            }
+
         }
         binding.doubleLayout.addView(column1Layout);
         binding.doubleLayout.addView(column2Layout);
@@ -151,6 +179,12 @@ public class DoubleFragment extends Fragment {
             TextView nameText = new TextView(this.getContext());
             nameText.setText(item.getName());
             nameText.setWidth(nameWidth);
+            nameText.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    makeDialogue(item);
+                }
+            });
 
             ll.addView(nameText);
 
@@ -189,13 +223,13 @@ public class DoubleFragment extends Fragment {
         addBtn.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
-                makeDialogue();
+                makeDialogue(null);
             }
         });
         binding.doubleLayout.addView(addBtn);
     }
 
-    private void makeDialogue(){
+    private void makeDialogue(Entity target){
         int height = 150;
         int width = 100;
         int INF = 9999;
@@ -207,7 +241,18 @@ public class DoubleFragment extends Fragment {
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
 
-        ad.setTitle("추가하기");
+        Calendar dateValue;
+        if(target != null){
+            dateValue = target.getDate();
+        }else {
+            dateValue = Entity.getToday();
+        }
+
+        if(target != null){
+            ad.setTitle("수정하기");
+        }else {
+            ad.setTitle("추가하기");
+        }
         LinearLayout ll = new LinearLayout(this.getContext());
         ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -228,8 +273,10 @@ public class DoubleFragment extends Fragment {
         EditText nameInput = new EditText(this.getContext());
         nameInput.setWidth(INF);
         nameInput.setHint("이름을 입력하시오.");
+        if(target != null){
+            nameInput.setText(target.getName());
+        }
         nameLayout.addView(nameInput);
-
         ll.addView(nameLayout);
 
         //
@@ -249,6 +296,11 @@ public class DoubleFragment extends Fragment {
         periodInput.setGravity(Gravity.CENTER);
         periodInput.setHint(String.valueOf(1));
         periodInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        if(target != null){
+            periodInput.setText(String.valueOf(target.getPeriod()));
+        }
+
         periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -272,9 +324,30 @@ public class DoubleFragment extends Fragment {
         periodList.add(yearStr);
         ArrayAdapter<String> periodAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, periodList);
         periodSpinner.setAdapter(periodAdapter);
+
+        if(target != null) {
+            int selection = 0;
+            switch(target.getPeriodType()){
+                case Entity.PERIOD_DAY:
+                    selection = 0;
+                    break;
+                case Entity.PERIOD_WEEK:
+                    selection = 1;
+                    break;
+                case Entity.PERIOD_MONTH:
+                    selection = 2;
+                    break;
+                case Entity.PERIOD_YEAR:
+                    selection = 3;
+                    break;
+            }
+            periodSpinner.setSelection(selection);
+        }
+
         periodLayout.addView(periodSpinner);
 
         ll.addView(periodLayout);
+
 
         //
         // 기준 날짜
@@ -288,7 +361,6 @@ public class DoubleFragment extends Fragment {
         dateText.setText("주기 : ");
         dateLayout.addView(dateText);
 
-        Calendar dateValue = Entity.getToday();
         Context ctx = this.getContext();
 
         Button dateButton = new Button(this.getContext());
@@ -309,8 +381,8 @@ public class DoubleFragment extends Fragment {
             }
         });
         dateLayout.addView(dateButton);
-
         ll.addView(dateLayout);
+
 
         ad.setPositiveButton("설정", new DialogInterface.OnClickListener(){
             @Override
@@ -362,12 +434,105 @@ public class DoubleFragment extends Fragment {
             }
         });
 
+        if(target != null) {
+            ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int index) {
+                    list.remove(target);
+                    makeUI();
+                }
+            });
+        }
+
         ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
             }
         });
+
+        ad.setView(ll);
+        ad.show();
+    }
+
+    private void makeColumnDialog(int target){
+        int height = 150;
+        int width = 100;
+        int INF = 9999;
+
+        AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
+        if(target >= 0) {
+            ad.setTitle("열 수정");
+        } else {
+            ad.setTitle("열 추가");
+        }
+
+        LinearLayout ll = new LinearLayout(this.getContext());
+        ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setPadding(100, 20, 100, 100);
+
+        LinearLayout nameLayout = new LinearLayout(this.getContext());
+        nameLayout.setOrientation(LinearLayout.HORIZONTAL);
+        nameLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
+
+        TextView nameText = new TextView(this.getContext());
+        nameText.setWidth(width);
+        nameText.setText("이름 : ");
+        nameLayout.addView(nameText);
+
+        EditText nameInput = new EditText(this.getContext());
+        nameInput.setWidth(INF);
+        nameInput.setHint("이름을 입력하시오.");
+
+        if(target >= 0){
+            nameInput.setText(list.getColumns().get(target));
+        }
+        nameLayout.addView(nameInput);
+        ll.addView(nameLayout);
+
+        ad.setPositiveButton("설정", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int index){
+                final String name;
+
+                if(nameInput.getText().toString().equals("")){
+                    name = "새로운 열";
+                }else{
+                    name = nameInput.getText().toString();
+                }
+
+                if(target >= 0){
+                    list.getColumns().set(target, name);
+                } else {
+                    list.getColumns().add(name);
+                    for (Entity item : list.getList()) {
+                        item.addValueToList('X');
+                    }
+                }
+                makeUI();
+            }
+        });
+
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        if(target >= 0) {
+            ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int index) {
+                    list.getColumns().remove(target);
+                    for(Entity item : list.getList()){
+                        item.removeValueListAt(target);
+                    }
+                    makeUI();
+                }
+            });
+        }
 
         ad.setView(ll);
         ad.show();

@@ -51,7 +51,7 @@ public class NormalChecklist extends Fragment {
     private String tableName = "";
     private Context mainContext;
 
-    private EntityList list = new EntityList(EntityList.CHECK_ENTITY);
+    private EntityList list;
     FragmentNormalChecklistBinding binding;
 
     public NormalChecklist() {
@@ -112,6 +112,12 @@ public class NormalChecklist extends Fragment {
             TextView text = new TextView(this.getContext());
             text.setText(name);
             text.setWidth(300);
+            text.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    makeDialogue(item);
+                }
+            });
 
             LinearLayout.MarginLayoutParams margin = new LinearLayout.MarginLayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             margin.setMargins(0, 0, 100, 0);
@@ -166,7 +172,7 @@ public class NormalChecklist extends Fragment {
         addBtn.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View view) {
-                makeDialogue();
+                makeDialogue(null);
             }
         });
         binding.normalListLayout.addView(addBtn);
@@ -176,7 +182,7 @@ public class NormalChecklist extends Fragment {
         view.setLayoutParams(new LinearLayout.LayoutParams(width, height));
     }
 
-    private void makeDialogue(){
+    private void makeDialogue(Entity target){
         int height = 150;
         int width = 100;
         int INF = 9999;
@@ -188,9 +194,21 @@ public class NormalChecklist extends Fragment {
         String monthStr = "월";
         String yearStr = "년";
 
+        Calendar dateValue;
+        if(target != null){
+            dateValue = target.getDate();
+        }else{
+            dateValue = Entity.getToday();
+        }
+
+
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
 
-        ad.setTitle("추가하기");
+        if(target != null){
+            ad.setTitle("수정하기");
+        }else {
+            ad.setTitle("추가하기");
+        }
         LinearLayout ll = new LinearLayout(this.getContext());
         ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -213,6 +231,10 @@ public class NormalChecklist extends Fragment {
         nameInput.setHint("이름을 입력하시오.");
         nameLayout.addView(nameInput);
 
+        if(target != null){
+            nameInput.setText(target.getName());
+        }
+
         ll.addView(nameLayout);
 
         //
@@ -232,6 +254,11 @@ public class NormalChecklist extends Fragment {
         periodInput.setGravity(Gravity.CENTER);
         periodInput.setHint(String.valueOf(1));
         periodInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        if(target != null){
+            periodInput.setText(String.valueOf(target.getPeriod()));
+        }
+
         periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -255,8 +282,25 @@ public class NormalChecklist extends Fragment {
         periodList.add(yearStr);
         ArrayAdapter<String> periodAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, periodList);
         periodSpinner.setAdapter(periodAdapter);
+        if(target != null) {
+            int selection = 0;
+            switch(target.getPeriodType()){
+                case Entity.PERIOD_DAY:
+                    selection = 0;
+                    break;
+                case Entity.PERIOD_WEEK:
+                    selection = 1;
+                    break;
+                case Entity.PERIOD_MONTH:
+                    selection = 2;
+                    break;
+                case Entity.PERIOD_YEAR:
+                    selection = 3;
+                    break;
+            }
+            periodSpinner.setSelection(selection);
+        }
         periodLayout.addView(periodSpinner);
-
         ll.addView(periodLayout);
 
         //
@@ -271,7 +315,6 @@ public class NormalChecklist extends Fragment {
         dateText.setText("주기 : ");
         dateLayout.addView(dateText);
 
-        Calendar dateValue = Entity.getToday();
         Context ctx = this.getContext();
 
         Button dateButton = new Button(this.getContext());
@@ -314,6 +357,22 @@ public class NormalChecklist extends Fragment {
         typeList.add(numStr);
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, typeList);
         typeSpinner.setAdapter(typeAdapter);
+        if(target != null) {
+            int selection = 0;
+            switch(target.getType()){
+                case Entity.TYPE_CHECK:
+                    selection = 0;
+                    break;
+                case Entity.TYPE_COUNT:
+                    selection = 1;
+                    break;
+                case Entity.TYPE_NUM:
+                    selection = 2;
+                    break;
+            }
+            typeSpinner.setSelection(selection);
+        }
+
         typeLayout.addView(typeSpinner);
 
         ll.addView(typeLayout);
@@ -334,6 +393,11 @@ public class NormalChecklist extends Fragment {
         goalInput.setWidth(INF);
         goalInput.setHint("목표 수치를 입력하시오.");
         goalInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        if(target != null) {
+            goalInput.setText(String.valueOf(target.getGoal()));
+        }
+
         goalInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -429,10 +493,28 @@ public class NormalChecklist extends Fragment {
                     return;
                 }
 
-                list.add(new Entity(type, name, 0, goal, periodType, period));
+                if(target == null) {
+                    list.add(new Entity(type, name, 0, goal, periodType, period));
+                }else{
+                    target.setType(type);
+                    target.setName(name);
+                    target.setGoal(goal);
+                    target.setPeriodType(periodType);
+                    target.setPeriod(period);
+                }
                 makeUI();
             }
         });
+
+        if(target != null) {
+            ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int index) {
+                    list.remove(target);
+                    makeUI();
+                }
+            });
+        }
 
         ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
             @Override

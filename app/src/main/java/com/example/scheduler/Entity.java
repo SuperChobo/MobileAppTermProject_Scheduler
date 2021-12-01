@@ -30,10 +30,15 @@ public class Entity {
     private String valueList;
 
     public Entity(String name, String valueList, int periodType, int period){
+        this(name, valueList, periodType, period, getToday());
+    }
+
+    public Entity(String name, String valueList, int periodType, int period, Calendar date){
         this.name = name;
         this.valueList = valueList;
         this.periodType = periodType;
         this.period = period;
+        this.date = date;
     }
 
     public Entity(int type, String name, int value, int goal, int periodType, int period){
@@ -88,6 +93,10 @@ public class Entity {
         }
     }
 
+    public void setType(int type) { this.type = type; }
+
+    public void setGoal(int goal) { this.goal = goal; }
+
     public void setName(String name){
         this.name = name;
     }
@@ -95,6 +104,10 @@ public class Entity {
     public void setDate(Calendar date){
         this.date = date;
     }
+
+    public void setPeriod(int period) { this.period = period; }
+
+    public void setPeriodType(int periodType) { this.periodType = periodType; }
 
     public int getGoal() {
         return goal;
@@ -132,11 +145,15 @@ public class Entity {
         return valueList;
     }
 
-    public String removeValueList(int index){
+    public String removeValueListAt(int index){
         return valueList = valueList.substring(0, index) + valueList.substring(index + 1);
     }
 
-    public String setValueOfList(char value, int index){
+    public String setValueOfList(char value, int index) {
         return valueList = valueList.substring(0, index) + value + valueList.substring(index + 1);
+    }
+
+    public String addValueToList(char value){
+        return valueList = valueList + value;
     }
 }

@@ -8,27 +8,41 @@ public class EntityList {
     public static int SCHEDULE_ENTITY = 2;
     public static int DOUBLE_ENTITY = 3;
 
-    private int name;
+    private String name;
+    private int type;
     private List<Entity> list;
     private List<String> columns;
 
     public EntityList(int type){
-        name = type;
-        list = new ArrayList<Entity>();
+        this("", type);
+    }
+    public EntityList(int type, List<String> columnList){
+        this("", type, columnList);
+    }
 
+    public EntityList(String name, int type){
+        this.name = name;
+        this.type = type;
+        list = new ArrayList<Entity>();
         if(type == DOUBLE_ENTITY){
             columns = new ArrayList<String>();
         }
     }
 
-    public EntityList(int type, List<String> columnList){
-        name = type;
+    public EntityList(String name, int type, List<String> columnList){
+        this.name = name;
+        this.type = type;
         list = new ArrayList<Entity>();
         columns = columnList;
     }
 
-    public int getName() {
+    public String getName(){
         return name;
+    }
+
+
+    public int getType() {
+        return type;
     }
 
     public List<Entity> getList(){
@@ -47,8 +61,17 @@ public class EntityList {
         list.remove(index);
     }
 
-    public void get(int index){
-        list.get(index);
+    public void remove(Entity target){
+        for(int i = 0; i < size(); i++){
+            if(list.get(i).equals(target)){
+                list.remove(i);
+                return;
+            }
+        }
+    }
+
+    public Entity get(int index){
+        return list.get(index);
     }
 
     public List<String> getColumns(){

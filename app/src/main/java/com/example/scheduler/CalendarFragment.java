@@ -105,6 +105,12 @@ public class CalendarFragment extends Fragment {
             TextView dateText = new TextView(this.getContext());
             dateText.setText(item.getDateString());
             dateText.setWidth(500);
+            dateText.setOnClickListener(new View.OnClickListener(){
+               @Override
+               public void onClick(View view) {
+                   makeDialogue(item);
+               }
+            });
 
             ll.addView(dateText);
 
@@ -136,10 +142,10 @@ public class CalendarFragment extends Fragment {
         Context ctx = this.getContext();
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
-        if(target == null){
-            ad.setTitle("추가하기");
-        }else{
+        if(target != null){
             ad.setTitle("수정하기");
+        }else {
+            ad.setTitle("추가하기");
         }
         LinearLayout ll = new LinearLayout(this.getContext());
         ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -260,6 +266,16 @@ public class CalendarFragment extends Fragment {
                 makeUI();
             }
         });
+
+        if(target != null) {
+            ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int index) {
+                    list.remove(target);
+                    makeUI();
+                }
+            });
+        }
 
         ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
             @Override
