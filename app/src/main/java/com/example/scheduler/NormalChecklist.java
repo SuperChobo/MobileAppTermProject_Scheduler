@@ -57,6 +57,7 @@ public class NormalChecklist extends Fragment {
     public NormalChecklist() {
         // Required empty public constructor
     }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -94,25 +95,29 @@ public class NormalChecklist extends Fragment {
         return binding.getRoot();
     }
 
-    public void setData(EntityList data){
+    public void setData(EntityList data) {
         list = data;
     }
-    public void setTableName(String name) { tableName = name; }
 
-    private void makeUI(){
+    public void setTableName(String name) {
+        tableName = name;
+    }
+
+    private void makeUI() {
         binding.normalTableName.setText(tableName);
         binding.normalListLayout.removeAllViews();
 
-        for(Entity item : list.getList()) {
+        for (Entity item : list.getList()) {
             LinearLayout ll = new LinearLayout(this.getContext());
             ll.setOrientation(LinearLayout.HORIZONTAL);
+            ll.setGravity(Gravity.CENTER_VERTICAL);
             ll.setMinimumHeight(100);
             String name = item.getName();
 
             TextView text = new TextView(this.getContext());
             text.setText(name);
             text.setWidth(300);
-            text.setOnLongClickListener(new View.OnLongClickListener(){
+            text.setOnLongClickListener(new View.OnLongClickListener() {
                 public boolean onLongClick(View view) {
                     makeDialogue(item);
                     return true;
@@ -129,7 +134,7 @@ public class NormalChecklist extends Fragment {
                 case Entity.TYPE_CHECK:
                     CheckBox cb = new CheckBox(this.getContext());
                     cb.setChecked(item.getValueBool());
-                    cb.setOnClickListener(new CheckBox.OnClickListener(){
+                    cb.setOnClickListener(new CheckBox.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             item.valueNotBoolean();
@@ -149,17 +154,73 @@ public class NormalChecklist extends Fragment {
                     pb.setProgress(item.getValue() * 100 / item.getGoal());
                     ll.addView(pb);
                     */
-
+                {
                     TextView numText = new TextView(this.getContext());
                     numText.setText(String.valueOf(item.getValue()) + " / " + String.valueOf(item.getGoal()));
                     ll.addView(numText);
-                    break;
 
-                case Entity.TYPE_COUNT:
+                    LinearLayout buttonLayout = new LinearLayout(this.getContext());
+
+                    buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    buttonLayout.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                    buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+                    Button adjustButton = new Button(this.getContext());
+                    adjustButton.setText("수정");
+                    adjustButton.setLayoutParams(new LinearLayout.LayoutParams(160, 90));
+                    adjustButton.setTextSize(10);
+                    adjustButton.setGravity(Gravity.CENTER);
+                    buttonLayout.addView(adjustButton);
+                    adjustButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            makeNumDialogue(item);
+                            makeUI();
+                        }
+                    });
+                    ll.addView(buttonLayout);
+                    break;
+                }
+                case Entity.TYPE_COUNT: {
                     TextView countText = new TextView(this.getContext());
                     countText.setText(String.valueOf(item.getValue()) + " / " + String.valueOf(item.getGoal()));
                     ll.addView(countText);
+
+                    LinearLayout buttonLayout = new LinearLayout(this.getContext());
+
+                    buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    buttonLayout.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                    buttonLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+                    Button addButton = new Button(this.getContext());
+                    addButton.setText("+");
+                    addButton.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+                    addButton.setTextSize(10);
+                    addButton.setGravity(Gravity.CENTER);
+                    addButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            item.setValue(item.getValue() + 1);
+                            makeUI();
+                        }
+                    });
+                    buttonLayout.addView(addButton);
+
+                    Button subButton = new Button(this.getContext());
+                    subButton.setText("-");
+                    subButton.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
+                    subButton.setTextSize(12);
+                    subButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            item.setValue(item.getValue() - 1);
+                            makeUI();
+                        }
+                    });
+                    buttonLayout.addView(subButton);
+                    ll.addView(buttonLayout);
                     break;
+                }
             }
 
             binding.normalListLayout.addView(ll);
@@ -169,7 +230,7 @@ public class NormalChecklist extends Fragment {
         addBtn.setLayoutParams(new LinearLayout.LayoutParams(80, 80));
         addBtn.setTextSize(10);
         addBtn.setText("+");
-        addBtn.setOnClickListener(new Button.OnClickListener(){
+        addBtn.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
                 makeDialogue(null);
@@ -178,11 +239,11 @@ public class NormalChecklist extends Fragment {
         binding.normalListLayout.addView(addBtn);
     }
 
-    private void setSize(View view, int width, int height){
+    private void setSize(View view, int width, int height) {
         view.setLayoutParams(new LinearLayout.LayoutParams(width, height));
     }
 
-    private void makeDialogue(Entity target){
+    private void makeDialogue(Entity target) {
         int height = 150;
         int width = 100;
         int INF = 9999;
@@ -195,18 +256,18 @@ public class NormalChecklist extends Fragment {
         String yearStr = "년";
 
         Calendar dateValue;
-        if(target != null){
+        if (target != null) {
             dateValue = target.getDate();
-        }else{
+        } else {
             dateValue = Entity.getToday();
         }
 
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
 
-        if(target != null){
+        if (target != null) {
             ad.setTitle("수정하기");
-        }else {
+        } else {
             ad.setTitle("추가하기");
         }
         LinearLayout ll = new LinearLayout(this.getContext());
@@ -231,7 +292,7 @@ public class NormalChecklist extends Fragment {
         nameInput.setHint("이름을 입력하시오.");
         nameLayout.addView(nameInput);
 
-        if(target != null){
+        if (target != null) {
             nameInput.setText(target.getName());
         }
 
@@ -255,17 +316,17 @@ public class NormalChecklist extends Fragment {
         periodInput.setHint(String.valueOf(1));
         periodInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 
-        if(target != null){
+        if (target != null) {
             periodInput.setText(String.valueOf(target.getPeriod()));
         }
 
-        periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+        periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                try{
+                try {
                     String str = periodInput.getText().toString().trim();
                     int num = Integer.parseInt(str);
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
                     periodInput.setText("");
                 }
@@ -282,9 +343,9 @@ public class NormalChecklist extends Fragment {
         periodList.add(yearStr);
         ArrayAdapter<String> periodAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, periodList);
         periodSpinner.setAdapter(periodAdapter);
-        if(target != null) {
+        if (target != null) {
             int selection = 0;
-            switch(target.getPeriodType()){
+            switch (target.getPeriodType()) {
                 case Entity.PERIOD_DAY:
                     selection = 0;
                     break;
@@ -321,10 +382,10 @@ public class NormalChecklist extends Fragment {
         dateButton.setWidth(INF);
         dateButton.setText(new SimpleDateFormat("yyyy-MM-dd").format(dateValue.getTime()));
 
-        dateButton.setOnClickListener(new Button.OnClickListener(){
+        dateButton.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatePickerDialog dp = new  DatePickerDialog(ctx, new DatePickerDialog.OnDateSetListener(){
+                DatePickerDialog dp = new DatePickerDialog(ctx, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                         dateValue.set(i, i1, i2);
@@ -357,9 +418,9 @@ public class NormalChecklist extends Fragment {
         typeList.add(numStr);
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, typeList);
         typeSpinner.setAdapter(typeAdapter);
-        if(target != null) {
+        if (target != null) {
             int selection = 0;
-            switch(target.getType()){
+            switch (target.getType()) {
                 case Entity.TYPE_CHECK:
                     selection = 0;
                     break;
@@ -394,17 +455,17 @@ public class NormalChecklist extends Fragment {
         goalInput.setHint("목표 수치를 입력하시오.");
         goalInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 
-        if(target != null) {
+        if (target != null) {
             goalInput.setText(String.valueOf(target.getGoal()));
         }
 
-        goalInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+        goalInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                try{
+                try {
                     String str = goalInput.getText().toString().trim();
                     int num = Integer.parseInt(str);
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
                     goalInput.setText("");
                 }
@@ -413,11 +474,11 @@ public class NormalChecklist extends Fragment {
         });
         goalLayout.addView(goalInput);
 
-        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 ll.removeView(goalLayout);
-                if(!checkStr.equals(typeSpinner.getItemAtPosition(i).toString())){
+                if (!checkStr.equals(typeSpinner.getItemAtPosition(i).toString())) {
                     ll.addView(goalLayout);
                 }
             }
@@ -428,9 +489,9 @@ public class NormalChecklist extends Fragment {
             }
         });
 
-        ad.setPositiveButton("설정", new DialogInterface.OnClickListener(){
+        ad.setPositiveButton("설정", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int i){
+            public void onClick(DialogInterface dialog, int i) {
                 int type = -1;
                 String name;
                 int periodType;
@@ -438,20 +499,20 @@ public class NormalChecklist extends Fragment {
                 int goal = 0;
 
                 String selectedType = typeSpinner.getSelectedItem().toString();
-                if(selectedType.equals(checkStr)){
+                if (selectedType.equals(checkStr)) {
                     type = Entity.TYPE_CHECK;
-                }else if(selectedType.equals(countStr)){
+                } else if (selectedType.equals(countStr)) {
                     type = Entity.TYPE_COUNT;
-                }else if(selectedType.equals(numStr)){
+                } else if (selectedType.equals(numStr)) {
                     type = Entity.TYPE_NUM;
-                }else{
+                } else {
                     Log.i("test", "Type error");
                     return;
                 }
 
-                if(nameInput.getText().toString().equals("")){
+                if (nameInput.getText().toString().equals("")) {
                     name = "새로운 항목";
-                }else{
+                } else {
                     name = nameInput.getText().toString();
                 }
 
@@ -461,22 +522,22 @@ public class NormalChecklist extends Fragment {
                     } else {
                         goal = Integer.parseInt(goalInput.getText().toString().trim());
                     }
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
                     goalInput.setText("");
                     return;
                 }
 
                 String periodTypeStr = periodSpinner.getSelectedItem().toString();
-                if(periodTypeStr.equals(dayStr)){
+                if (periodTypeStr.equals(dayStr)) {
                     periodType = Entity.PERIOD_DAY;
-                }else if(periodTypeStr.equals(weekStr)){
+                } else if (periodTypeStr.equals(weekStr)) {
                     periodType = Entity.PERIOD_WEEK;
-                }else if(periodTypeStr.equals(monthStr)) {
+                } else if (periodTypeStr.equals(monthStr)) {
                     periodType = Entity.PERIOD_MONTH;
-                }else if(periodTypeStr.equals(yearStr)){
+                } else if (periodTypeStr.equals(yearStr)) {
                     periodType = Entity.PERIOD_YEAR;
-                }else{
+                } else {
                     Log.i("test", "Period error");
                     return;
                 }
@@ -486,16 +547,16 @@ public class NormalChecklist extends Fragment {
                     } else {
                         period = Integer.parseInt(periodInput.getText().toString().trim());
                     }
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
                     periodInput.setText("");
                     //ad.dismiss();
                     return;
                 }
 
-                if(target == null) {
+                if (target == null) {
                     list.add(new Entity(type, name, 0, goal, periodType, period));
-                }else{
+                } else {
                     target.setType(type);
                     target.setName(name);
                     target.setGoal(goal);
@@ -506,7 +567,7 @@ public class NormalChecklist extends Fragment {
             }
         });
 
-        if(target != null) {
+        if (target != null) {
             ad.setNeutralButton("삭제", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int index) {
@@ -516,7 +577,7 @@ public class NormalChecklist extends Fragment {
             });
         }
 
-        ad.setNegativeButton("취소", new DialogInterface.OnClickListener(){
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -527,43 +588,60 @@ public class NormalChecklist extends Fragment {
         ad.show();
     }
 
-    // 버리는 코드
-    /*
-    //  Toast.makeText(MainActivity.this, , ).show();
-        ConstraintLayout nameLayout = new ConstraintLayout(this.getContext());
-        nameLayout.setId(View.generateViewId());
-        nameLayout.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, height));
-        ConstraintSet nameConstraint = new ConstraintSet();
-        nameConstraint.clone(nameLayout);
+    private void makeNumDialogue(Entity target) {
+        int height = 150;
+        int width = 100;
+        int INF = 9999;
 
-        //ConstraintLayout.LayoutParams constraintParent = new ConstraintLayout.LayoutParams(100, 100);
-        ConstraintLayout.LayoutParams constraintParent = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_CONSTRAINT, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT);
-        TextView nameText = new TextView(this.getContext());
-        nameText.setId(View.generateViewId());
-        nameText.setText("이름 : ");
+        AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
+        ad.setTitle("값 수정");
 
-        nameConstraint.constrainHeight(nameText.getId(), ConstraintSet.WRAP_CONTENT);
-        nameConstraint.constrainWidth(nameText.getId(), ConstraintSet.WRAP_CONTENT);
-        nameConstraint.connect(nameText.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
-        nameConstraint.connect(nameText.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-        nameConstraint.connect(nameText.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-        //nameConstraint.connect(text.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
-        nameLayout.addView(nameText);
+        LinearLayout ll = new LinearLayout(this.getContext());
+        ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setPadding(100, 20, 100, 100);
 
-        EditText nameInput = new EditText(this.getContext());
-        nameInput.setId(View.generateViewId());
-        nameInput.setHint("이름을 입력하세요");
+        LinearLayout numLayout = new LinearLayout(this.getContext());
+        numLayout.setOrientation(LinearLayout.HORIZONTAL);
+        numLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height));
 
-        nameConstraint.constrainHeight(nameInput.getId(), height);
-        nameConstraint.constrainWidth(nameInput.getId(), ConstraintSet.MATCH_CONSTRAINT);
-        nameConstraint.connect(nameInput.getId(), ConstraintSet.START, nameText.getId(), ConstraintSet.END);
-        nameConstraint.connect(nameInput.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-        nameConstraint.connect(nameInput.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-        nameConstraint.connect(nameInput.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-        nameLayout.addView(nameInput);
+        TextView numText = new TextView(this.getContext());
+        numText.setWidth(width);
+        numText.setText("값 : ");
+        numLayout.addView(numText);
 
+        EditText numInput = new EditText(this.getContext());
+        numInput.setWidth(INF);
+        numInput.setHint("원하는 수치를 입력하시오.");
+        numInput.setText(String.valueOf(target.getValue()));
+        numInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
+        numLayout.addView(numInput);
 
-        nameConstraint.applyTo(nameLayout);
+        ll.addView(numLayout);
 
-         */
+        ad.setPositiveButton("설정", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                int num = 0;
+                try {
+                    num = Integer.parseInt(numInput.getText().toString().trim());
+                } catch (NumberFormatException e) {
+                    Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
+                    numInput.setText("");
+                }
+                target.setValue(num);
+                makeUI();
+            }
+        });
+
+        ad.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        ad.setView(ll);
+        ad.show();
+    }
 }

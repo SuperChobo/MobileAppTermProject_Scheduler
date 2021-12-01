@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         list.get(1).add(new Entity(
                 Entity.TYPE_CHECK, "운동", Entity.VALUE_FALSE, Entity.VALUE_TRUE, Entity.PERIOD_DAY, 1));
         list.get(1).add(new Entity(
-                Entity.TYPE_NUM, "게임", 5, 10, Entity.PERIOD_WEEK, 1));
+                Entity.TYPE_COUNT, "게임", 5, 10, Entity.PERIOD_WEEK, 1));
         list.get(1).add(new Entity(
                 Entity.TYPE_CHECK, "공부", Entity.VALUE_TRUE, Entity.VALUE_TRUE, Entity.PERIOD_DAY, 1));
         list.get(1).add(new Entity(
