@@ -1,6 +1,8 @@
 package com.example.scheduler;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class EntityList {
@@ -71,6 +73,10 @@ public class EntityList {
                 return;
             }
         }
+    }
+
+    public void sort(Comparator<Entity> cmp){
+        Collections.sort(list, cmp);
     }
 
     public Entity get(int index){

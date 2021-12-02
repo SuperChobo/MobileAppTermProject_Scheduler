@@ -24,6 +24,7 @@ import com.example.scheduler.databinding.FragmentCalendarBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -96,6 +97,17 @@ public class CalendarFragment extends Fragment {
     void makeUI(){
         binding.calendarTableName.setText(tableName);
         binding.calendarListLayout.removeAllViews();
+
+        list.sort(new Comparator<Entity>() {
+            @Override
+            public int compare(Entity entity, Entity t1) {
+                if(entity.getDate().after(t1.getDate()))
+                    return 1;
+                else if(entity.getDate().before(t1.getDate()))
+                    return -1;
+                return 0;
+            }
+        });
 
         for(Entity item : list.getList()){
             LinearLayout ll = new LinearLayout(this.getContext());

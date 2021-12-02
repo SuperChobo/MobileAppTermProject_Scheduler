@@ -86,9 +86,17 @@ public class MainActivity extends AppCompatActivity {
 
         //ScheduleEntity(String name, int year, int month, int day, int hour, int minute)
         list.get(0).add(new Entity(
-                "수업", 2021, 11, 24, 9, 40));
+                "과제", 2021, 11, 24, 9, 40));
         list.get(0).add(new Entity(
                 "게임", 2020, 1, 5, 9, 40));
+        list.get(0).add(new Entity(
+                "여행", 2022, 2, 5, 9, 40));
+        list.get(0).add(new Entity(
+                "모앱실강", 2021, 12, 5, 9, 35));
+        list.get(0).add(new Entity(
+                "디비실강", 2021, 12, 5, 9, 40));
+        list.get(0).add(new Entity(
+                "컴통실강", 2021, 12, 5, 9, 30));
 
         //CheckEntity(int type, String name, int value, int goal, int periodType, int period)
         list.get(1).add(new Entity(
