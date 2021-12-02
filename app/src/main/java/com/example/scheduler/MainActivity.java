@@ -2,7 +2,6 @@ package com.example.scheduler;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -12,6 +11,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.scheduler.databinding.ActivityMainBinding;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Advanced Scheduler");
 
         //getWindow().setNavigationBarColor(Color.GRAY);
-        getWindow().setStatusBarColor(Color.GRAY);
+        getWindow().setStatusBarColor(ResourcesCompat.getColor(getResources(), R.color.teal_700, null));
         DBInit();
 
         setTabView();
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         doubleFragment = new DoubleFragment();
 
         list.add(new EntityList("스케줄", EntityList.SCHEDULE_ENTITY));
-        list.add(new EntityList("체크", EntityList.NORMAL_ENTITY));
+        list.add(new EntityList("목표", EntityList.NORMAL_ENTITY));
 
         List<String> strList = new ArrayList<String>();
         strList.add("국어");
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void makeDialog(int target){
         final String scheduleStr = "스케줄";
-        final String normalStr = "일반";
+        final String normalStr = "목표";
         final String doubleStr = "2차원";
 
         int height = 150;
