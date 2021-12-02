@@ -108,13 +108,19 @@ public class CalendarFragment extends Fragment {
             }
         });
 
+
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         if(!binding.dataSwitch.isChecked()){
             makeScheduleUI();
         }else{
             makeDataUI();
         }
-
-        return binding.getRoot();
     }
 
     public void setData(EntityList data){
@@ -304,12 +310,17 @@ public class CalendarFragment extends Fragment {
             }else {
                 periodText.setText("[".concat(String.valueOf(item.getPeriod())).concat(item.getPeriodTypeString()).concat(" 마다]"));
             }
-            periodText.setLayoutParams(new LinearLayout.LayoutParams(250, 100));
-
+            periodText.setGravity(Gravity.LEFT);
+            periodText.setLayoutParams(new LinearLayout.LayoutParams(200, 100));
             ll.addView(periodText);
 
+            TextView timeText = new TextView(this.getContext());
+            timeText.setText(item.getHourString());
+            timeText.setLayoutParams(new LinearLayout.LayoutParams(250, 100));
+            ll.addView(timeText);
+
             TextView nameText = new TextView(this.getContext());
-            nameText.setText(item.getName().concat(" (").concat(item.getHourString()).concat(")"));
+            nameText.setText(item.getName());
             ll.addView(nameText);
 
             ll.setOnLongClickListener(new View.OnLongClickListener(){
