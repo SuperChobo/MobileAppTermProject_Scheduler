@@ -87,17 +87,17 @@ public class MainActivity extends AppCompatActivity {
 
         //ScheduleEntity(String name, int year, int month, int day, int hour, int minute)
         list.get(0).add(new Entity(
-                "과제", 2021, 11, 24, 9, 40));
+                "과제", 2021, 11, 24, 9, 40, Entity.PERIOD_WEEK, 1));
         list.get(0).add(new Entity(
-                "게임", 2020, 1, 5, 9, 40));
+                "공부", 2021, 11, 21, 9, 40, Entity.PERIOD_DAY, 1));
         list.get(0).add(new Entity(
-                "여행", 2022, 2, 5, 9, 40));
+                "게임", 2021, 1, 5, 10, 40, Entity.PERIOD_DAY, 2));
         list.get(0).add(new Entity(
-                "모앱실강", 2021, 12, 5, 9, 35));
+                "여행", 2021, 12, 10, 11, 40, Entity.PERIOD_NONE, 1));
         list.get(0).add(new Entity(
-                "디비실강", 2021, 12, 5, 9, 40));
+                "모앱실강", 2021, 12, 5, 12, 35, Entity.PERIOD_WEEK, 1));
         list.get(0).add(new Entity(
-                "컴통실강", 2021, 12, 5, 9, 30));
+                "디비실강", 2021, 12, 6, 13, 40, Entity.PERIOD_WEEK, 1));
 
         //CheckEntity(int type, String name, int value, int goal, int periodType, int period)
         list.get(1).add(new Entity(
@@ -153,13 +153,16 @@ public class MainActivity extends AppCompatActivity {
                     selected = normalChecklist;
                     normalChecklist.setTableName(binding.menuTab.getTabAt(position).getText().toString());
                     normalChecklist.setData(list.get(position));
+                    UsefulFunction.refreshEntityList(list.get(position));
                     break;
                 case EntityList.DOUBLE_ENTITY:
                     selected = doubleFragment;
                     doubleFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
                     doubleFragment.setData(list.get(position));
+                    UsefulFunction.refreshEntityList(list.get(position));
                     break;
             }
+
             binding.titleText.setText(list.get(position).getName());
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
         } else {
@@ -262,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
                 if(target != -1){
                     list.get(target).setName(name);
                     binding.menuTab.getTabAt(target).setText(name);
-
                 } else {
                     list.add(new EntityList(name, type));
                     TabLayout tabLayout = binding.menuTab;

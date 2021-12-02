@@ -244,11 +244,13 @@ public class NormalChecklist extends Fragment {
 
     private void makeDialogue(Entity target) {
         int height = 150;
-        int width = 100;
+        int width = 200;
         int INF = 9999;
         String checkStr = "체크리스트";
         String countStr = "카운트";
         String numStr = "수치";
+
+        String noneStr = "반복 안함";
         String dayStr = "일";
         String weekStr = "주";
         String monthStr = "월";
@@ -336,6 +338,7 @@ public class NormalChecklist extends Fragment {
 
         Spinner periodSpinner = new Spinner(this.getContext());
         List<String> periodList = new ArrayList<String>();
+        periodList.add(noneStr);
         periodList.add(dayStr);
         periodList.add(weekStr);
         periodList.add(monthStr);
@@ -345,18 +348,22 @@ public class NormalChecklist extends Fragment {
         if (target != null) {
             int selection = 0;
             switch (target.getPeriodType()) {
-                case Entity.PERIOD_DAY:
+                case Entity.PERIOD_NONE:
                     selection = 0;
                     break;
-                case Entity.PERIOD_WEEK:
+                case Entity.PERIOD_DAY:
                     selection = 1;
                     break;
-                case Entity.PERIOD_MONTH:
+                case Entity.PERIOD_WEEK:
                     selection = 2;
                     break;
-                case Entity.PERIOD_YEAR:
+                case Entity.PERIOD_MONTH:
                     selection = 3;
                     break;
+                case Entity.PERIOD_YEAR:
+                    selection = 4;
+                    break;
+
             }
             periodSpinner.setSelection(selection);
         }
@@ -372,7 +379,7 @@ public class NormalChecklist extends Fragment {
 
         TextView dateText = new TextView(this.getContext());
         dateText.setWidth(width);
-        dateText.setText("주기 : ");
+        dateText.setText("마감 날짜 : ");
         dateLayout.addView(dateText);
 
         Context ctx = this.getContext();
@@ -395,8 +402,26 @@ public class NormalChecklist extends Fragment {
             }
         });
         dateLayout.addView(dateButton);
-
         ll.addView(dateLayout);
+
+        periodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (noneStr.equals(periodSpinner.getItemAtPosition(i).toString())) {
+                    periodLayout.removeView(periodInput);
+                }else {
+                    if(periodLayout.indexOfChild(periodInput) < 0) {
+                        periodLayout.addView(periodInput, 1);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
 
         //
         //  타입
@@ -536,6 +561,8 @@ public class NormalChecklist extends Fragment {
                     periodType = Entity.PERIOD_MONTH;
                 } else if (periodTypeStr.equals(yearStr)) {
                     periodType = Entity.PERIOD_YEAR;
+                } else if (periodTypeStr.equals(noneStr)) {
+                    periodType = Entity.PERIOD_NONE;
                 } else {
                     Log.i("test", "Period error");
                     return;
@@ -554,13 +581,14 @@ public class NormalChecklist extends Fragment {
                 }
 
                 if (target == null) {
-                    list.add(new Entity(type, name, 0, goal, periodType, period));
+                    list.add(new Entity(type, name, 0, goal, periodType, period, dateValue));
                 } else {
                     target.setType(type);
                     target.setName(name);
                     target.setGoal(goal);
                     target.setPeriodType(periodType);
                     target.setPeriod(period);
+                    target.setDate(dateValue);
                 }
                 makeUI();
             }

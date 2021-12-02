@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -229,13 +230,15 @@ public class DoubleFragment extends Fragment {
 
     private void makeDialogue(Entity target){
         int height = 150;
-        int width = 100;
+        int width = 200;
         int INF = 9999;
 
+        String noneStr = "반복 안함";
         String dayStr = "일";
         String weekStr = "주";
         String monthStr = "월";
         String yearStr = "년";
+
 
         AlertDialog.Builder ad = new AlertDialog.Builder(this.getContext());
 
@@ -295,17 +298,17 @@ public class DoubleFragment extends Fragment {
         periodInput.setHint(String.valueOf(1));
         periodInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 
-        if(target != null){
+        if (target != null) {
             periodInput.setText(String.valueOf(target.getPeriod()));
         }
 
-        periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener(){
+        periodInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                try{
+                try {
                     String str = periodInput.getText().toString().trim();
                     int num = Integer.parseInt(str);
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast.makeText(mainContext, "숫자만 입력하세요", Toast.LENGTH_SHORT).show();
                     periodInput.setText("");
                 }
@@ -316,36 +319,37 @@ public class DoubleFragment extends Fragment {
 
         Spinner periodSpinner = new Spinner(this.getContext());
         List<String> periodList = new ArrayList<String>();
+        periodList.add(noneStr);
         periodList.add(dayStr);
         periodList.add(weekStr);
         periodList.add(monthStr);
         periodList.add(yearStr);
         ArrayAdapter<String> periodAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_spinner_dropdown_item, periodList);
         periodSpinner.setAdapter(periodAdapter);
-
-        if(target != null) {
+        if (target != null) {
             int selection = 0;
-            switch(target.getPeriodType()){
-                case Entity.PERIOD_DAY:
+            switch (target.getPeriodType()) {
+                case Entity.PERIOD_NONE:
                     selection = 0;
                     break;
-                case Entity.PERIOD_WEEK:
+                case Entity.PERIOD_DAY:
                     selection = 1;
                     break;
-                case Entity.PERIOD_MONTH:
+                case Entity.PERIOD_WEEK:
                     selection = 2;
                     break;
-                case Entity.PERIOD_YEAR:
+                case Entity.PERIOD_MONTH:
                     selection = 3;
                     break;
+                case Entity.PERIOD_YEAR:
+                    selection = 4;
+                    break;
+
             }
             periodSpinner.setSelection(selection);
         }
-
         periodLayout.addView(periodSpinner);
-
         ll.addView(periodLayout);
-
 
         //
         // 기준 날짜
@@ -356,7 +360,7 @@ public class DoubleFragment extends Fragment {
 
         TextView dateText = new TextView(this.getContext());
         dateText.setWidth(width);
-        dateText.setText("주기 : ");
+        dateText.setText("마감 날짜 : ");
         dateLayout.addView(dateText);
 
         Context ctx = this.getContext();
@@ -381,6 +385,23 @@ public class DoubleFragment extends Fragment {
         dateLayout.addView(dateButton);
         ll.addView(dateLayout);
 
+        periodSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (noneStr.equals(periodSpinner.getItemAtPosition(i).toString())) {
+                    periodLayout.removeView(periodInput);
+                }else {
+                    if(periodLayout.indexOfChild(periodInput) < 0) {
+                        periodLayout.addView(periodInput, 1);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         ad.setPositiveButton("설정", new DialogInterface.OnClickListener(){
             @Override
@@ -396,15 +417,17 @@ public class DoubleFragment extends Fragment {
                 }
 
                 String periodTypeStr = periodSpinner.getSelectedItem().toString();
-                if(periodTypeStr.equals(dayStr)){
+                if (periodTypeStr.equals(dayStr)) {
                     periodType = Entity.PERIOD_DAY;
-                }else if(periodTypeStr.equals(weekStr)){
+                } else if (periodTypeStr.equals(weekStr)) {
                     periodType = Entity.PERIOD_WEEK;
-                }else if(periodTypeStr.equals(monthStr)) {
+                } else if (periodTypeStr.equals(monthStr)) {
                     periodType = Entity.PERIOD_MONTH;
-                }else if(periodTypeStr.equals(yearStr)){
+                } else if (periodTypeStr.equals(yearStr)) {
                     periodType = Entity.PERIOD_YEAR;
-                }else{
+                } else if (periodTypeStr.equals(noneStr)) {
+                    periodType = Entity.PERIOD_NONE;
+                } else {
                     Log.i("test", "Period error");
                     return;
                 }
@@ -427,7 +450,15 @@ public class DoubleFragment extends Fragment {
                     values = values + "X";
                 }
 
-                list.add(new Entity(name, values, periodType, period));
+                if(target == null) {
+                    list.add(new Entity(name, values, periodType, period, dateValue));
+                }else{
+                    target.setName(name);
+                    target.setValueList(values);
+                    target.setPeriodType(periodType);
+                    target.setPeriod(period);
+                    target.setDate(dateValue);
+                }
                 makeUI();
             }
         });
