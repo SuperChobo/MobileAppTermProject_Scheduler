@@ -2,6 +2,7 @@ package com.example.scheduler;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -34,11 +35,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-
-
         setContentView(view);
         setTitle("Advanced Scheduler");
 
+        //getWindow().setNavigationBarColor(Color.GRAY);
+        getWindow().setStatusBarColor(Color.GRAY);
         DBInit();
 
         setTabView();
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     doubleFragment.setData(list.get(position));
                     break;
             }
+            binding.titleText.setText(list.get(position).getName());
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
         } else {
             makeDialog(-1);

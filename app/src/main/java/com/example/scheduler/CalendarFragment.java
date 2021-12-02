@@ -95,7 +95,6 @@ public class CalendarFragment extends Fragment {
     public void setTableName(String name) { tableName = name; }
 
     void makeUI(){
-        binding.calendarTableName.setText(tableName);
         binding.calendarListLayout.removeAllViews();
 
         list.sort(new Comparator<Entity>() {

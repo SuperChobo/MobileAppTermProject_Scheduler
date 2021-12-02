@@ -104,7 +104,6 @@ public class NormalChecklist extends Fragment {
     }
 
     private void makeUI() {
-        binding.normalTableName.setText(tableName);
         binding.normalListLayout.removeAllViews();
 
         for (Entity item : list.getList()) {

@@ -103,7 +103,6 @@ public class DoubleFragment extends Fragment {
         int height = 100;
         int widthAdjust = 30;
 
-        binding.doubleTableName.setText(tableName);
         binding.doubleLayout.removeAllViews();
 
         LinearLayout column1Layout = new LinearLayout(this.getContext());
