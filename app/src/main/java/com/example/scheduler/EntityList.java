@@ -10,25 +10,17 @@ public class EntityList {
     public static final int SCHEDULE_ENTITY = 2;
     public static final int DOUBLE_ENTITY = 3;
 
-    private String name;
-    private int type;
-    private List<Entity> list;
-    private List<String> columns;
+    private String name = "";
+    private int type = 0;
+    private List<Entity> list = null;
+    private List<String> columns = null;
 
-    public EntityList(int type){
-        this("", type);
-    }
-    public EntityList(int type, List<String> columnList){
-        this("", type, columnList);
-    }
 
     public EntityList(String name, int type){
         this.name = name;
         this.type = type;
         list = new ArrayList<Entity>();
-        if(type == DOUBLE_ENTITY){
-            columns = new ArrayList<String>();
-        }
+        columns = new ArrayList<String>();
     }
 
     public EntityList(String name, int type, List<Entity> list, List<String> columns){

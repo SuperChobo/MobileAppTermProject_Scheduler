@@ -51,7 +51,7 @@ public class DoubleFragment extends Fragment {
 
     Context mainContext;
     private String tableName;
-    private EntityList list = new EntityList(EntityList.SCHEDULE_ENTITY);
+    private EntityList list;
 
     FragmentDoubleBinding binding;
 
@@ -293,7 +293,7 @@ public class DoubleFragment extends Fragment {
         periodLayout.addView(periodText);
 
         EditText periodInput = new EditText(this.getContext());
-        periodInput.setWidth(width * 2);
+        periodInput.setWidth(width);
         periodInput.setGravity(Gravity.CENTER);
         periodInput.setHint(String.valueOf(1));
         periodInput.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
@@ -360,7 +360,7 @@ public class DoubleFragment extends Fragment {
 
         TextView dateText = new TextView(this.getContext());
         dateText.setWidth(width);
-        dateText.setText("마감 날짜 : ");
+        dateText.setText("기한 : ");
         dateLayout.addView(dateText);
 
         Context ctx = this.getContext();

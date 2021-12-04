@@ -55,7 +55,7 @@ public class CalendarFragment extends Fragment {
     private Context mainContext;
 
     private String tableName = "";
-    private EntityList list = new EntityList(EntityList.SCHEDULE_ENTITY);
+    private EntityList list;
     FragmentCalendarBinding binding;
 
     public CalendarFragment() {

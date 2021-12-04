@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     UsefulFunction.refreshEntityList(list.get(position));
                     break;
             }
+            binding.titleText.setText(list.get(position).getName());
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
         } else {
             makeDialog(-1);
