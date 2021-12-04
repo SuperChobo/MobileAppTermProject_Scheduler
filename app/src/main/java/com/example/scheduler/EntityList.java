@@ -31,6 +31,13 @@ public class EntityList {
         }
     }
 
+    public EntityList(String name, int type, List<Entity> list, List<String> columns){
+        this.name = name;
+        this.type = type;
+        this.list = list;
+        this.columns = columns;
+    }
+
     public EntityList(String name, int type, List<String> columnList){
         this.name = name;
         this.type = type;

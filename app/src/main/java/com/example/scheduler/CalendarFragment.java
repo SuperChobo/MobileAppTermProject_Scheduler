@@ -108,14 +108,12 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-
-
         return binding.getRoot();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         if(!binding.dataSwitch.isChecked()){
             makeScheduleUI();
         }else{
@@ -562,7 +560,6 @@ public class CalendarFragment extends Fragment {
                     name = nameInput.getText().toString();
                 }
 
-
                 String periodTypeStr = periodSpinner.getSelectedItem().toString();
                 if (periodTypeStr.equals(dayStr)) {
                     periodType = Entity.PERIOD_DAY;
@@ -592,20 +589,13 @@ public class CalendarFragment extends Fragment {
                     return;
                 }
 
-
-                if(nameInput.getText().toString().equals("")){
-                    if(target == null) {
-                        list.add(new Entity("새로운 스케줄", dateValue));
-                    }else{
-                        Toast.makeText(mainContext, "이름을 입력하세요.", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    if(target == null) {
-                        list.add(new Entity(nameInput.getText().toString(), dateValue));
-                    }else{
-                        target.setName(nameInput.getText().toString());
-                        target.setDate(dateValue);
-                    }
+                if (target == null) {
+                    list.add(new Entity(name, periodType, period, dateValue));
+                } else {
+                    target.setName(name);
+                    target.setPeriodType(periodType);
+                    target.setPeriod(period);
+                    target.setDate(dateValue);
                 }
                 makeDataUI();
             }

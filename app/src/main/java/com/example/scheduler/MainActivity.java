@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private CalendarFragment calendarFragment;
     private DoubleFragment doubleFragment;
     private List<EntityList> list;
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        db = new DBHelper(MainActivity.this, "Scheduler.db", null, 3);
         setTitle("Advanced Scheduler");
 
         //getWindow().setNavigationBarColor(Color.GRAY);
@@ -67,13 +69,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void DBInit(){
-        list = new ArrayList<EntityList>();
-
-        calendarFragment = new CalendarFragment();
-        normalChecklist = new NormalChecklist();
-        blankFragment = new BlankFragment();
-        doubleFragment = new DoubleFragment();
-
+        list = db.getTable();
+        /*
         list.add(new EntityList("스케줄", EntityList.SCHEDULE_ENTITY));
         list.add(new EntityList("목표", EntityList.NORMAL_ENTITY));
 
@@ -123,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 "문제필이", "XOXOX", Entity.PERIOD_WEEK, 1));
         list.get(2).add(new Entity(
                 "오답노트", "OXOXO", Entity.PERIOD_WEEK, 1));
+
+        */
+    }
+
+    public void saveData(View view){
+        db.setTable(list);
     }
 
     private void setTabView(){
@@ -145,25 +148,26 @@ public class MainActivity extends AppCompatActivity {
         if (position < list.size()) {
             switch (list.get(position).getType()) {
                 case EntityList.SCHEDULE_ENTITY:
+                    calendarFragment = new CalendarFragment();
                     selected = calendarFragment;
                     calendarFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
                     calendarFragment.setData(list.get(position));
                     break;
                 case EntityList.NORMAL_ENTITY:
+                    normalChecklist = new NormalChecklist();
                     selected = normalChecklist;
                     normalChecklist.setTableName(binding.menuTab.getTabAt(position).getText().toString());
                     normalChecklist.setData(list.get(position));
                     UsefulFunction.refreshEntityList(list.get(position));
                     break;
                 case EntityList.DOUBLE_ENTITY:
+                    doubleFragment = new DoubleFragment();
                     selected = doubleFragment;
                     doubleFragment.setTableName(binding.menuTab.getTabAt(position).getText().toString());
                     doubleFragment.setData(list.get(position));
                     UsefulFunction.refreshEntityList(list.get(position));
                     break;
             }
-
-            binding.titleText.setText(list.get(position).getName());
             getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, selected).commit();
         } else {
             makeDialog(-1);
@@ -290,6 +294,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialogInterface, int index) {
                     list.remove(target);
                     binding.menuTab.removeTabAt(target);
+                    if(list.size() == 0){
+                        getSupportFragmentManager().beginTransaction().replace(R.id.mainFrame, new BlankFragment()).commit();
+                    }
                 }
             });
         }

@@ -30,10 +30,24 @@ public class Entity {
     private int periodType;
     private int period;
     private Calendar date = null;
+    private String valueList = "";
 
     private static final DateFormat hourFormat = new SimpleDateFormat("HH시 mm분");
     private static final DateFormat dateFormat = new SimpleDateFormat("yy년 MM월 dd일");
-    private String valueList;
+
+    public Entity(String name, int type, int value, int goal, int periodType, int period, int year, int month, int date, int hour, int minute, String valueList){
+        this.name = name;
+        this.type = type;
+        this.value = value;
+        this.goal = goal;
+        this.periodType = periodType;
+        this.period = period;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, date, hour, minute, 0);
+        this.date = calendar;
+        this.valueList = valueList;
+    }
 
     public Entity(String name, String valueList, int periodType, int period){
         this(name, valueList, periodType, period, getToday());
@@ -49,6 +63,13 @@ public class Entity {
 
     public Entity(int type, String name, int value, int goal, int periodType, int period){
         this(type, name, value, goal, periodType, period, getToday());
+    }
+
+    public Entity(String name, int periodType, int period, Calendar date){
+        this.name = name;
+        this.periodType = periodType;
+        this.period = period;
+        this.date = date;
     }
 
     public Entity(int type, String name, int value, int goal, int periodType, int period, Calendar date){

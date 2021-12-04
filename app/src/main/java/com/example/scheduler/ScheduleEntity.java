@@ -17,10 +17,6 @@ public class ScheduleEntity {
 
     }
 
-    public String getName(){
-        return name;
-    }
-
     public Calendar getDate(){
         return date;
     }
